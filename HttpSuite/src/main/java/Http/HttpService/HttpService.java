@@ -19,7 +19,7 @@ public class HttpService {
 	
 	@Test
 	public void test() {
-		HttpRequest hr=new HttpRequest("http://www.scbc.test/system/check_login.htm");
+		HttpRequest hr=new HttpRequest("www.xxx.com");
 		form f=new form();
 		hr.post(f,"utf-8");
 	}
