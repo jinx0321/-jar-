@@ -20,11 +20,13 @@ import Http.Header.HttpHeader;
 import Http.Request.Param.form;
 import Http.Request.Param.json;
 import Http.Response.HttpResponse;
+import Http.Response.HttpResponseTools;
 
 public class HttpRequest implements HttpRequestPost{
 	private String url;
 	private HttpHeader header;
 	private HttpCookie cookie;
+	private HttpClient client = HttpClients.createDefault();// 创建默认http连接
 	public HttpRequest() {
 		
 	}
@@ -50,7 +52,6 @@ public class HttpRequest implements HttpRequestPost{
 		this.cookie = cookie;
 	}
 	public HttpResponse post(form form,String encoding) {
-		HttpClient client = HttpClients.createDefault();// 创建默认http连接
 	    HttpPost post = new HttpPost(this.url);// 创建一个post请求
 	    List<NameValuePair> paramList = new ArrayList<NameValuePair>();
 	    form.GetAllFromNames().forEach(e->{
@@ -66,30 +67,7 @@ public class HttpRequest implements HttpRequestPost{
         try {
         	//发送http请求
 			org.apache.http.HttpResponse response = client.execute(post);
-			HttpResponse hp=new HttpResponse();
-			HttpHeader hheader=new HttpHeader();
-			HttpCookie hc=new HttpCookie();
-			Header[] hds=response.getAllHeaders();
-			for(int i=0;i<hds.length;i++) {
-				try {
-					hheader.AddHeader(hds[i].getName(), hds[i].getValue());
-					if(hds[i].getName().toLowerCase().contains("set-cookie")) {
-						hc.AddCookie(hds[i].getName(), hds[i].getValue());
-					}
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-			//返回信息头
-			hp.setHeader(hheader);
-			//返回信息cookie
-			hp.setCookie(cookie);
-			//状态码
-			hp.setStatus_code(String.valueOf(response.getStatusLine().getStatusCode()));
-			HttpEntity entity2=response.getEntity();
-			System.out.println(EntityUtils.toString(entity2));
-			
-
+			return HttpResponseTools.Switch(response);
 		} catch (ClientProtocolException e1) {
 			e1.printStackTrace();
 		} catch (IOException e1) {
@@ -103,7 +81,6 @@ public class HttpRequest implements HttpRequestPost{
 	}
 	@Override
 	public HttpResponse post() {
-		HttpClient client = HttpClients.createDefault();// 创建默认http连接
 	    HttpPost post = new HttpPost(this.url);// 创建一个post请求
         try {
         	//发送http请求
